@@ -2,5 +2,45 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "./apps/client-portal"
+    },
+    {
+      "path": "./apps/admin-portal"
+    },
+    {
+      "path": "./libs/ui"
+    },
+    {
+      "path": "./libs/auth"
+    },
+    {
+      "path": "./libs/supabase"
+    },
+    {
+      "path": "./libs/shared-types"
+    },
+    {
+      "path": "./libs/shared-utils"
+    },
+    {
+      "path": "./libs/shared-hooks"
+    },
+    {
+      "path": "./libs/features-team"
+    },
+    {
+      "path": "./libs/features-projects"
+    },
+    {
+      "path": "./libs/features-dashboard"
+    },
+    {
+      "path": "./libs/features-media"
+    },
+    {
+      "path": "./libs/theme"
+    }
+  ]
 }

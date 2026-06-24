@@ -1,0 +1,21 @@
+{
+  "name": "@dev-team-cv/admin-portal",
+  "projectType": "application",
+  "sourceRoot": "apps/admin-portal/src",
+  "targets": {
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "buildTarget": "@dev-team-cv/admin-portal:build",
+        "port": 4300
+      }
+    },
+    "build": {
+      "executor": "@nx/vite:build",
+      "options": {
+        "outputPath": "apps/admin-portal/dist",
+        "configFile": "apps/admin-portal/vite.config.ts"
+      }
+    }
+  }
+}

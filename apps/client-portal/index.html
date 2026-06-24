@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO -->
+    <title>DevTeam — Software Engineering Studio</title>
+    <meta name="description" content="A focused team of engineers crafting elegant, performant cross-platform experiences. Flutter, React, TypeScript, Supabase." />
+    <meta name="keywords" content="software engineering, flutter, react, mobile development, web development" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DevTeam — Software Engineering Studio" />
+    <meta property="og:description" content="A focused team of engineers crafting elegant, performant cross-platform experiences." />
+    <meta property="og:url" content="https://devteam.dev" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DevTeam — Software Engineering Studio" />
+    <meta name="twitter:description" content="A focused team of engineers crafting elegant, performant cross-platform experiences." />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://devteam.dev" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "DevTeam",
+      "description": "Software Engineering Studio specialising in cross-platform mobile and web applications.",
+      "url": "https://devteam.dev"
+    }
+    </script>
+
+    <!-- Theme flicker prevention inline script -->
+    <script>
+      (function() {
+        var s = localStorage.getItem('theme');
+        var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var t = (s === 'dark' || s === 'light') ? s : (d ? 'dark' : 'light');
+        document.documentElement.classList.add(t);
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-blue-600 focus:px-4 focus:py-2 focus:text-white">
+      Skip to main content
+    </a>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

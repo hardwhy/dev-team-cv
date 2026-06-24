@@ -2,18 +2,55 @@
   "name": "@dev-team-cv/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev:client": "vite apps/client-portal --config apps/client-portal/vite.config.ts",
+    "dev:admin": "vite apps/admin-portal --config apps/admin-portal/vite.config.ts",
+    "build:client": "vite build apps/client-portal --config apps/client-portal/vite.config.ts",
+    "build:admin": "vite build apps/admin-portal --config apps/admin-portal/vite.config.ts",
+    "build": "npm run build:client && npm run build:admin",
+    "preview:client": "vite preview apps/client-portal --config apps/client-portal/vite.config.ts",
+    "preview:admin": "vite preview apps/admin-portal --config apps/admin-portal/vite.config.ts"
+  },
   "private": true,
-  "dependencies": {},
   "devDependencies": {
-    "@nx/js": "23.0.1",
+    "@babel/core": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
+    "@nx/js": "^23.0.1",
+    "@nx/react": "^23.0.1",
+    "@nx/vite": "^23.0.1",
+    "@nx/web": "23.0.1",
     "@swc/helpers": "~0.5.18",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "jiti": "2.4.2",
     "nx": "23.0.1",
     "prettier": "~3.6.2",
     "tslib": "^2.3.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vite": "^5.4.21"
   },
   "workspaces": [
-    "packages/*"
-  ]
+    "packages/*",
+    "apps/*",
+    "libs/*"
+  ],
+  "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "@rollup/rollup-darwin-arm64": "^4.62.2",
+    "@supabase/supabase-js": "^2.78.0",
+    "autoprefixer": "^10.5.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.41.0",
+    "lucide-react": "^1.21.0",
+    "postcss": "^8.5.15",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.80.0",
+    "react-intersection-observer": "^10.0.3",
+    "react-router-dom": "^6.30.4",
+    "tailwindcss": "^3.4.19",
+    "zod": "^4.4.3"
+  }
 }

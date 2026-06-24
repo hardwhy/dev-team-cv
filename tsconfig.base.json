@@ -5,7 +5,9 @@
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "noEmitOnError": true,
@@ -16,6 +18,44 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@dev-team-cv/source"]
+    "customConditions": [
+      "@dev-team-cv/source"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@dev-team-cv/ui": [
+        "libs/ui/src/index.ts"
+      ],
+      "@dev-team-cv/auth": [
+        "libs/auth/src/index.ts"
+      ],
+      "@dev-team-cv/supabase": [
+        "libs/supabase/src/index.ts"
+      ],
+      "@dev-team-cv/shared-types": [
+        "libs/shared-types/src/index.ts"
+      ],
+      "@dev-team-cv/shared-utils": [
+        "libs/shared-utils/src/index.ts"
+      ],
+      "@dev-team-cv/shared-hooks": [
+        "libs/shared-hooks/src/index.ts"
+      ],
+      "@dev-team-cv/features-team": [
+        "libs/features-team/src/index.ts"
+      ],
+      "@dev-team-cv/features-projects": [
+        "libs/features-projects/src/index.ts"
+      ],
+      "@dev-team-cv/features-dashboard": [
+        "libs/features-dashboard/src/index.ts"
+      ],
+      "@dev-team-cv/features-media": [
+        "libs/features-media/src/index.ts"
+      ],
+      "@dev-team-cv/theme": [
+        "libs/theme/src/index.ts"
+      ]
+    }
   }
 }

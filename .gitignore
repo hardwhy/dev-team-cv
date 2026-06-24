@@ -43,3 +43,15 @@ Thumbs.db
 .nx/migrate-runs
 .claude/worktrees
 .claude/settings.local.json
+
+vite.config.*.timestamp*
+# Env files
+.env
+.env.local
+.env.*.local
+apps/**/.env
+apps/**/.env.local
+
+# Build output
+apps/**/dist
+

@@ -1,0 +1,21 @@
+{
+  "name": "@dev-team-cv/client-portal",
+  "projectType": "application",
+  "sourceRoot": "apps/client-portal/src",
+  "targets": {
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "buildTarget": "@dev-team-cv/client-portal:build",
+        "port": 4200
+      }
+    },
+    "build": {
+      "executor": "@nx/vite:build",
+      "options": {
+        "outputPath": "apps/client-portal/dist",
+        "configFile": "apps/client-portal/vite.config.ts"
+      }
+    }
+  }
+}
