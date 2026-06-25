@@ -5,7 +5,6 @@ import { LoginPage } from './pages/login-page';
 import { DashboardPage } from './pages/dashboard-page';
 import { TeamPage } from './pages/team-page';
 import { ProjectsPage } from './pages/projects-page';
-import { MediaPage } from './pages/media-page';
 import { ContactsPage } from './pages/contacts-page';
 import { SettingsPage } from './pages/settings-page';
 
@@ -25,7 +24,6 @@ export function App() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="projects" element={<ProjectsPage />} />
-        <Route path="media" element={<MediaPage />} />
         <Route path="contacts" element={<ContactsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
