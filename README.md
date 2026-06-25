@@ -1,41 +1,43 @@
-# DevTeam Portfolio Platform
+# 🚀 DevTeam Portfolio
 
-A production-ready team portfolio platform built with Nx, React, Vite, Tailwind CSS, and Supabase.
+A slick portfolio platform for our dev team — built with **Nx**, **React**, **Vite**, **Tailwind CSS**, and **Supabase**. Two apps in one repo: a public-facing portfolio site and a private admin dashboard.
 
-## Architecture
+---
+
+## 🗂 What's in here?
 
 ```
 apps/
-├── client-portal   → Public-facing portfolio website (port 4200)
-└── admin-portal    → CMS dashboard (port 4300)
+├── client-portal   → 🌐 Public portfolio (port 4200)
+└── admin-portal    → 🔐 CMS dashboard (port 4300)
 
 libs/
-├── ui              → Shared design system components
-├── auth            → Auth context, protected routes
-├── supabase        → Supabase client + API modules
-├── shared-types    → TypeScript types
-├── shared-utils    → Utility functions (cn, slugify, formatDate…)
-├── shared-hooks    → Custom hooks (useDragScroll, useScrollSpy…)
-├── features-team   → Team cards, profile drawer, constellation
-├── features-projects → Project cards, project modal
-├── features-dashboard → Dashboard widgets (reserved)
-├── features-media  → Media manager (reserved)
-└── theme           → ThemeProvider, dark/light, member colors
+├── ui              → 🎨 Shared design system (Button, Card, Badge, Drawer…)
+├── auth            → 🔑 Auth context + protected routes
+├── supabase        → 🗄 Supabase client + API modules
+├── shared-types    → 📝 TypeScript types shared across apps
+├── shared-utils    → 🛠 Handy utilities (cn, slugify, formatDate…)
+├── shared-hooks    → 🪝 Custom hooks (drag scroll, scroll spy, engineer mode…)
+├── features-team   → 👥 Team cards, profile sidebar, constellation canvas
+├── features-projects → 📦 Project cards + project modal
+├── theme           → 🌙 ThemeProvider, dark/light mode, member colors
 
 supabase/
-├── migrations/001_initial_schema.sql
-└── seed/001_seed.sql
+├── migrations/     → 📋 SQL schema files (run these once in Supabase)
+└── seed/           → 🌱 Seed data for team members
 ```
 
-## Quick Start
+---
+
+## ⚡ Quick start
 
 ### 1. Prerequisites
 
 - Node.js 18+
 - npm 9+
-- A [Supabase](https://supabase.com) project
+- A free [Supabase](https://supabase.com) project
 
-### 2. Clone & Install
+### 2. Install
 
 ```bash
 git clone <repo-url>
@@ -43,113 +45,87 @@ cd dev-team-cv
 npm install
 ```
 
-### 3. Set Up Supabase
+### 3. Set up Supabase
 
 1. Create a new project at [supabase.com](https://supabase.com)
-2. In the SQL editor, run `supabase/migrations/001_initial_schema.sql`
-3. Then run `supabase/seed/001_seed.sql` to seed the three team members
-4. Create two storage buckets: `team-members` and `projects` (set to Public)
+2. Open the SQL editor and run the migrations **in order**:
+   - `supabase/migrations/001_initial_schema.sql`
+   - `supabase/migrations/002_settings.sql`
+   - `supabase/migrations/003_contact_links_and_rls_fix.sql`
+3. Run the seed: `supabase/seed/001_seed.sql`
+4. Create two **public** storage buckets: `team-members` and `projects`
 
-### 4. Configure Environment Variables
-
-Copy the example env files and fill in your Supabase credentials:
+### 4. Environment variables
 
 ```bash
 cp apps/client-portal/.env.example apps/client-portal/.env
 cp apps/admin-portal/.env.example apps/admin-portal/.env
 ```
 
-Edit both `.env` files:
+Fill in both `.env` files:
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### 5. Run the Apps
+### 5. Run locally
 
-**Client Portal** (http://localhost:4200):
 ```bash
-npx vite --config apps/client-portal/vite.config.ts apps/client-portal
-```
-
-**Admin Portal** (http://localhost:4300):
-```bash
-npx vite --config apps/admin-portal/vite.config.ts apps/admin-portal
-```
-
-Or via Nx:
-```bash
+# Client portal → http://localhost:4200
 npx nx serve @dev-team-cv/client-portal
+
+# Admin portal → http://localhost:4300
 npx nx serve @dev-team-cv/admin-portal
 ```
 
-## Features
+---
 
-### Client Portal
-- Single-page scrolling experience with smooth section navigation
-- Hero, About, Team, Featured Projects, All Projects, Skills, Constellation, Contact
-- Horizontal drag-scroll for team members and projects
-- Interactive Team Constellation visualization (canvas)
-- Light / Dark mode with instant switching (no flicker)
-- Engineer Mode (`Shift+E`) — reveals architecture details
-- Scroll progress indicator
-- Section reveal animations
-- Contact form → stored in Supabase
+## ✨ Features
+
+### 🌐 Client Portal
+
+- Single-page scroll experience — hero, about, team, projects, skills, constellation, contact
+- Horizontal drag-scroll carousels for team members and projects
+- **Team member sidebar** — click any card to open a profile panel (no page takeover)
+- Interactive **Team Constellation** — canvas-based member + project relationship viz
+- 🌙 Light / Dark mode (no flicker, stored in localStorage)
+- 🤓 **Engineer Mode** (`Shift+E`) — reveals architecture details as an Easter egg
+- Scroll progress indicator + section reveal animations
+- Contact form that saves submissions to Supabase
 - Fully accessible (WCAG, keyboard nav, ARIA)
 
-### Admin Portal
+### 🔐 Admin Portal
+
 - Protected login (Supabase Auth)
-- Dashboard with stats and recent contact submissions
-- Full CRUD for Team Members (with photo upload)
-- Full CRUD for Projects (with thumbnail upload, member assignment)
-- Media manager (browse, upload, copy URL, delete)
-- Contact submission viewer
+- Dashboard with quick stats + recent contact submissions
+- **Team CRUD** — add/edit members with chip inputs for roles & skills, photo upload, color pickers
+- **Projects CRUD** — manage projects with compact thumbnail, tech chip input, member assignment
+- **Contacts** — view and delete contact form submissions
+- **Settings** — edit team branding + contact links (email, GitHub, etc.) shown on the public site
+- Dirty state tracking on all forms — save button only enables when there are actual changes
+- Dirty indicator dot 🟡 = unsaved, 🟢 = up to date
+- Sign out confirmation dialog
+- Theme toggler next to sign out in the header
 
-### Design System
-- Flat, clean, timeless design
-- CSS custom property based token system
-- Each team member has a personal color identity
-- Colors adapt between light and dark modes
+---
 
-## Deployment
+## 🎨 Design system
 
-### Vercel (recommended)
+Colors are driven by CSS custom properties, so dark/light mode just works. Each team member has their own color identity used in cards, badges, and the constellation.
 
-1. Push to GitHub
-2. Import in [Vercel](https://vercel.com)
-3. Set root directory to `apps/client-portal` (or `apps/admin-portal`)
-4. Add environment variables
-5. Set build command: `npm run build` (after adding vite build scripts)
+| Member | Color |
+|--------|-------|
+| Ayi Hardiyanto | Deep Blue `#2563EB` |
+| Dedy Indra Setiawan | Emerald `#059669` |
+| Muhammad Syehan | Warm Orange `#EA580C` |
 
-### Build Commands
+---
 
-```bash
-# Client portal
-cd apps/client-portal && npx vite build
+## 🛠 Tech stack
 
-# Admin portal
-cd apps/admin-portal && npx vite build
-```
-
-## Team Color Identity
-
-| Member | Primary | Usage |
-|--------|---------|-------|
-| Ayi Hardiyanto | Deep Blue `#2563EB` | Member cards, badges, highlights |
-| Dedy Indra Setiawan | Emerald Green `#059669` | Member cards, badges, highlights |
-| Muhammad Syehan | Warm Orange `#EA580C` | Member cards, badges, highlights |
-
-Colors are editable from the Admin Portal → Team → Edit Member.
-
-## Engineer Mode
-
-Press `Shift+E` on the client portal to toggle Engineer Mode. It overlays architecture and technical details on the hero section — a fun easter egg for fellow engineers.
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
+| Layer | Tech |
+|-------|------|
 | Monorepo | Nx 23 |
 | Frontend | React 18, Vite, TypeScript |
 | Styling | Tailwind CSS 3 |
@@ -158,3 +134,49 @@ Press `Shift+E` on the client portal to toggle Engineer Mode. It overlays archit
 | Animation | CSS transitions, Canvas API |
 | Backend | Supabase (PostgreSQL + Auth + Storage) |
 | Deploy | Vercel / Netlify |
+
+---
+
+## 🚢 Deployment
+
+### Vercel (recommended)
+
+1. Push to GitHub
+2. Import in [Vercel](https://vercel.com)
+3. Set root directory to `apps/client-portal` (or `apps/admin-portal` for the admin)
+4. Add your env variables
+5. Build command: `npx vite build`
+
+### Manual build
+
+```bash
+cd apps/client-portal && npx vite build
+cd apps/admin-portal && npx vite build
+```
+
+---
+
+## 🔧 Supabase RLS notes
+
+Row-level security is enabled on all tables. The key policies are:
+
+- **Public** can read `team_members`, `projects`, `project_members`, `site_settings`
+- **Authenticated users** (admins) can write to all of the above
+- **Anyone** can insert to `contact_submissions`; only admins can read/delete them
+
+If you get `new row violates row-level security policy` errors when saving, run migrations **003** and **004** in your Supabase SQL editor (in order):
+
+- **003** — splits table write policies into explicit `insert`/`update`/`delete` rules using `auth.uid() is not null` (more reliable than `auth.role()`)
+- **004** — adds storage bucket policies so thumbnail/photo uploads work for authenticated admins
+
+---
+
+## 🤓 Engineer Mode
+
+Press `Shift+E` on the public site to toggle a tech architecture overlay on the hero. It's a fun Easter egg for fellow engineers visiting the portfolio.
+
+---
+
+## 📬 Contact links
+
+You can manage the contact links (email, GitHub, LinkedIn, etc.) shown in the public contact section directly from **Admin → Settings → Contact Info**. Changes reflect immediately on the public site.

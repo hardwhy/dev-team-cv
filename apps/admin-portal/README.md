@@ -54,9 +54,11 @@ Login is handled via **Supabase Auth**. Create an admin user in your Supabase pr
 Run these SQL files in your Supabase SQL editor **in order**:
 
 ```
-supabase/migrations/001_initial_schema.sql  ← tables, RLS, triggers
-supabase/migrations/002_settings.sql        ← site settings table
-supabase/seed/001_seed.sql                  ← initial team members
+supabase/migrations/001_initial_schema.sql           ← tables, RLS, triggers
+supabase/migrations/002_settings.sql                 ← site settings table
+supabase/migrations/003_contact_links_and_rls_fix.sql ← RLS policy fix (required!)
+supabase/migrations/004_storage_policies.sql         ← storage upload policies (required!)
+supabase/seed/001_seed.sql                           ← initial team members
 ```
 
 ---
