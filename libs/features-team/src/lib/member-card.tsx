@@ -52,13 +52,13 @@ export function MemberCard({ member, onClick }: MemberCardProps) {
         </div>
       </div>
 
-      {/* Skills — push to fill space so "View profile" is always at the bottom */}
-      <div className="mt-4 flex flex-wrap gap-1.5 flex-1">
+      {/* Skills — fixed height row, no stretching */}
+      <div className="mt-4 flex flex-wrap gap-1.5 content-start flex-1">
         {topSkills.map((skill) => (
-          <Badge key={skill} label={skill} color={member.favorite_color} />
+          <Badge key={skill} label={skill} color={member.favorite_color} className="self-start" />
         ))}
         {member.skills.length > 3 && (
-          <span className="text-xs text-[var(--text-muted)] self-center">
+          <span className="text-xs text-[var(--text-muted)] self-start">
             +{member.skills.length - 3} more
           </span>
         )}
