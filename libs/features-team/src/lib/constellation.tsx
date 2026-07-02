@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTheme } from '@dev-team-cv/theme';
-import { SectionWrapper } from '@dev-team-cv/ui';
+import { SectionWrapper, SectionHeader } from '@dev-team-cv/ui';
 import type { TeamMember, Project, ConstellationNode, ConstellationEdge } from '@dev-team-cv/shared-types';
 
 interface ConstellationProps {
@@ -197,13 +197,11 @@ export function TeamConstellation({ members, projects }: ConstellationProps) {
   return (
     <SectionWrapper id="constellation" className="py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-12">
-          <p className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-widest mb-3">Collaboration</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)]">Team Constellation</h2>
-          <p className="mt-3 text-lg text-[var(--text-secondary)] max-w-xl">
-            How the team connects through shared projects.
-          </p>
-        </div>
+        <SectionHeader
+          label="Collaboration"
+          title="Team Constellation"
+          subtitle="How the team connects through shared projects."
+        />
 
         <div
           ref={containerRef}
