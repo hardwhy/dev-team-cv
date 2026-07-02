@@ -9,38 +9,38 @@ export function useSectionQuery(validSections: readonly string[]) {
   const [searchParams, setSearchParams] = useSearchParams();
   const onHome = location.pathname === '/';
   const section = onHome ? searchParams.get(SECTION_QUERY_KEY) ?? '' : '';
-  const scrollingRef = useRef(false);
+  const didInitialScroll = useRef(false);
 
   const goToSection = useCallback(
-    (id: string, { replace = false }: { replace?: boolean } = {}) => {
+    (id: string) => {
       if (!validSections.includes(id)) return;
 
       if (!onHome) {
-        navigate({ pathname: '/', search: `?${SECTION_QUERY_KEY}=${id}` });
+        navigate(id === 'hero' ? '/' : { pathname: '/', search: `?${SECTION_QUERY_KEY}=${id}` });
         return;
       }
 
-      scrollingRef.current = true;
-      setSearchParams({ [SECTION_QUERY_KEY]: id }, { replace });
+      setSearchParams(id === 'hero' ? {} : { [SECTION_QUERY_KEY]: id }, { replace: true });
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-      window.setTimeout(() => {
-        scrollingRef.current = false;
-      }, 800);
     },
     [navigate, onHome, setSearchParams, validSections]
   );
 
-  const syncSectionFromScroll = useCallback(
+  // Reflect the current scroll position into ?section= without triggering a scroll.
+  const setActiveSection = useCallback(
     (id: string) => {
-      if (!onHome || scrollingRef.current) return;
-      if (id === section) return;
-      setSearchParams({ [SECTION_QUERY_KEY]: id }, { replace: true });
+      if (!onHome) return;
+      const next = id === 'hero' ? '' : id;
+      if (next === (searchParams.get(SECTION_QUERY_KEY) ?? '')) return;
+      setSearchParams(next ? { [SECTION_QUERY_KEY]: next } : {}, { replace: true });
     },
-    [onHome, section, setSearchParams]
+    [onHome, searchParams, setSearchParams]
   );
 
+  // Only scroll on first load (e.g. opening /?section=team directly).
   useEffect(() => {
-    if (!onHome || scrollingRef.current) return;
+    if (!onHome || didInitialScroll.current) return;
+    didInitialScroll.current = true;
     const id = searchParams.get(SECTION_QUERY_KEY);
     if (!id || !validSections.includes(id)) return;
 
@@ -51,5 +51,5 @@ export function useSectionQuery(validSections: readonly string[]) {
     return () => window.clearTimeout(timer);
   }, [onHome, searchParams, validSections]);
 
-  return { onHome, section, goToSection, syncSectionFromScroll };
+  return { onHome, section, goToSection, setActiveSection };
 }
