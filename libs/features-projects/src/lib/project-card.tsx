@@ -1,13 +1,19 @@
 import { Badge, Avatar } from '@dev-team-cv/ui';
-import { cn, truncate } from '@dev-team-cv/shared-utils';
+import { cn } from '@dev-team-cv/shared-utils';
 import type { Project } from '@dev-team-cv/shared-types';
 
 interface ProjectCardProps {
   project: Project;
   onClick: (project: Project) => void;
+  layout?: 'scroll' | 'grid';
 }
 
-export function ProjectCard({ project, onClick }: ProjectCardProps) {
+const VISIBLE_TECH = 3;
+
+export function ProjectCard({ project, onClick, layout = 'scroll' }: ProjectCardProps) {
+  const visibleTech = project.technologies.slice(0, VISIBLE_TECH);
+  const hiddenTechCount = project.technologies.length - VISIBLE_TECH;
+
   return (
     <article
       role="button"
@@ -16,18 +22,18 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
       onClick={() => onClick(project)}
       onKeyDown={(e) => e.key === 'Enter' && onClick(project)}
       className={cn(
-        'group w-80 shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)]',
-        'overflow-hidden cursor-pointer transition-all duration-200',
-        'hover:-translate-y-1 hover:shadow-lg focus-visible:ring-2 outline-none'
+        'glass-card glass-card-interactive group rounded-2xl cursor-pointer flex flex-col focus-visible:ring-2 outline-none',
+        layout === 'grid'
+          ? 'w-full h-full min-h-[420px]'
+          : 'w-80 h-[420px] shrink-0'
       )}
     >
-      {/* Thumbnail */}
-      <div className="relative aspect-video overflow-hidden bg-[var(--surface-overlay)]">
+      <div className="card-thumb relative aspect-video shrink-0 bg-[var(--surface-overlay)] rounded-t-2xl">
         {project.thumbnail ? (
           <img
             src={project.thumbnail}
             alt={project.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover rounded-t-2xl transition-[filter] duration-300 group-hover:brightness-110"
             loading="lazy"
           />
         ) : (
@@ -39,6 +45,7 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
             </svg>
           </div>
         )}
+        <div className="absolute inset-0 rounded-t-2xl bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
         {project.featured && (
           <span className="absolute top-3 left-3 rounded-full bg-[var(--text-primary)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--surface)]">
             Featured
@@ -46,25 +53,25 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
         )}
       </div>
 
-      {/* Content */}
-      <div className="p-5">
-        <h3 className="font-semibold text-[var(--text-primary)] mb-1">{project.title}</h3>
-        <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-3">
-          {truncate(project.description, 90)}
+      <div className="p-5 flex flex-col flex-1 min-h-0 rounded-b-2xl bg-[color-mix(in_srgb,var(--surface-raised)_55%,transparent)]">
+        <h3 className="font-semibold text-[var(--text-primary)] line-clamp-1 shrink-0">
+          {project.title}
+        </h3>
+        <p className="text-sm text-[var(--text-secondary)] leading-relaxed mt-1 line-clamp-2 shrink-0">
+          {project.description}
         </p>
 
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {project.technologies.slice(0, 4).map((t) => (
+        <div className="chip-row mt-auto pt-3">
+          {visibleTech.map((t) => (
             <Badge key={t} label={t} />
           ))}
-          {project.technologies.length > 4 && (
-            <span className="text-xs text-[var(--text-muted)] self-center">+{project.technologies.length - 4}</span>
+          {hiddenTechCount > 0 && (
+            <span className="chip-more">+{hiddenTechCount} more</span>
           )}
         </div>
 
-        {/* Team avatars */}
         {project.team_members && project.team_members.length > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-3 shrink-0">
             <div className="flex -space-x-2">
               {project.team_members.slice(0, 3).map((m) => (
                 <Avatar
@@ -79,7 +86,9 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
               ))}
             </div>
             {project.team_members.length > 3 && (
-              <span className="text-xs text-[var(--text-muted)]">+{project.team_members.length - 3}</span>
+              <span className="text-xs text-[var(--text-muted)]">
+                +{project.team_members.length - 3}
+              </span>
             )}
           </div>
         )}
