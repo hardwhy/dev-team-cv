@@ -25,7 +25,7 @@ export function SectionWrapper({ id, children, className, as: Tag = 'section', .
 
   return (
     <Tag
-      ref={ref as React.RefObject<HTMLElement>}
+      ref={ref as React.RefObject<HTMLDivElement>}
       id={id}
       className={cn(
         'transition-all duration-500',
