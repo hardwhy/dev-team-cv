@@ -38,7 +38,6 @@
   ],
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
-    "@rollup/rollup-darwin-arm64": "^4.62.2",
     "@supabase/supabase-js": "^2.78.0",
     "autoprefixer": "^10.5.1",
     "clsx": "^2.1.1",

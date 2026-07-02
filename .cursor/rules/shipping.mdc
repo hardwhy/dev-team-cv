@@ -19,6 +19,38 @@ Every commit and PR title MUST follow [Conventional Commits](https://www.convent
 - Use lowercase, imperative mood, no trailing period. Example: `feat(client-portal): add projects filter`.
 - Breaking changes: add `!` after type/scope (`feat!: ...`) and a `BREAKING CHANGE:` footer.
 
+## Commits from changed context
+
+Only create commits when the user explicitly asks.
+
+Before committing, inspect the actual change context:
+
+- Run `git status` to see tracked and untracked files.
+- Run `git diff` to review unstaged/staged code changes.
+- Run `git log -10 --oneline` to match this repo's commit style.
+
+Then draft a commit message from the intent of the diff:
+
+- Choose the Conventional Commit type/scope from the behavior changed, not from file names alone.
+- Prefer one focused commit per coherent change. If unrelated changes are present, stage only the relevant files.
+- Do not include secrets or local-only files (`.env`, credentials, tokens, private keys).
+- Use a concise subject that explains the outcome, e.g. `ci: deploy client portal to github pages`.
+- Use a body only when the reason or migration notes are not obvious from the subject.
+
+Commit safely:
+
+```bash
+git add <relevant-files>
+git commit -m "$(cat <<'EOF'
+ci: deploy client portal to github pages
+
+EOF
+)"
+git status
+```
+
+Do not push after committing unless the user explicitly asks.
+
 ## Opening a PR
 
 Always use the repo template at `.github/PULL_REQUEST_TEMPLATE.md`. With the `gh` CLI, pass the filled template as the body:
