@@ -1,0 +1,57 @@
+---
+description: How to commit and open pull requests for this repo (conventional commits, PR template, safe git)
+alwaysApply: false
+---
+
+# Shipping (commits & PRs)
+
+Follow this whenever asked to commit, push, or open a PR.
+
+## Conventional Commits
+
+Every commit and PR title MUST follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(optional scope): <description>
+```
+
+- Allowed types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `perf`, `ci`, `build`, `style`, `refine`.
+- Use lowercase, imperative mood, no trailing period. Example: `feat(client-portal): add projects filter`.
+- Breaking changes: add `!` after type/scope (`feat!: ...`) and a `BREAKING CHANGE:` footer.
+
+## Opening a PR
+
+Always use the repo template at `.github/PULL_REQUEST_TEMPLATE.md`. With the `gh` CLI, pass the filled template as the body:
+
+```bash
+git push -u origin HEAD
+gh pr create --title "feat: short summary" --body "$(cat <<'EOF'
+## Summary
+...fill sections from the template...
+EOF
+)"
+```
+
+Fill in every section (Summary, Type of change, Changes, Checklist). Keep the title = the primary conventional commit.
+
+## Attachments on a PR (if possible)
+
+If the change is user-facing and screenshots/recordings exist, attach them:
+
+1. Upload the file to the PR via a comment: `gh pr comment <number> --body "![screenshot](path-or-url)"`.
+   `gh` uploads local image/video paths and rewrites them to GitHub-hosted URLs.
+2. Reference the resulting URL in the PR's "Screenshots / recordings" section.
+
+If uploading isn't possible (no file, or `gh` can't attach it), note that in the PR body and continue — don't block shipping on it.
+
+## Guardrails — stay un-powerful
+
+Do NOT run destructive or history-rewriting git operations. Specifically:
+
+- NEVER `push --force` / `--force-with-lease` (especially to `main`/`master`).
+- NEVER `reset --hard`, `git clean -fdx`, `rebase`, `commit --amend`, or delete branches without explicit user request.
+- NEVER change git config, disable hooks (`--no-verify`), or push directly to `main` — open a PR instead.
+- Only commit files relevant to the change; never commit secrets (`.env`, keys, tokens).
+- If a commit is rejected by a hook, fix the issue and make a NEW commit — do not amend or bypass.
+
+When in doubt about a destructive action, stop and ask the user first.
