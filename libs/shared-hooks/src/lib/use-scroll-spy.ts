@@ -10,6 +10,10 @@ export function useScrollSpy(sectionIds: string[], offset = 80): string {
         const el = document.getElementById(id);
         if (el && el.offsetTop <= scrollY) current = id;
       }
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2;
+      if (atBottom) current = sectionIds[sectionIds.length - 1] ?? current;
       setActive(current);
     };
     window.addEventListener('scroll', handler, { passive: true });

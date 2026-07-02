@@ -5,73 +5,67 @@ import type { TeamMember } from '@dev-team-cv/shared-types';
 interface MemberCardProps {
   member: TeamMember;
   onClick: (member: TeamMember) => void;
+  selected?: boolean;
 }
 
-export function MemberCard({ member, onClick }: MemberCardProps) {
+const VISIBLE_SKILLS = 2;
+
+export function MemberCard({ member, onClick, selected }: MemberCardProps) {
   const primaryRole = member.role[0] ?? 'Engineer';
-  const topSkills = member.skills.slice(0, 3);
+  const visibleSkills = member.skills.slice(0, VISIBLE_SKILLS);
+  const hiddenCount = member.skills.length - VISIBLE_SKILLS;
 
   return (
     <article
       role="button"
       tabIndex={0}
       aria-label={`View ${member.full_name}'s profile`}
+      aria-pressed={selected}
       onClick={() => onClick(member)}
       onKeyDown={(e) => e.key === 'Enter' && onClick(member)}
       className={cn(
-        // Fixed width, full height of the flex row so all cards stretch equally
-        'group relative w-72 h-full shrink-0 rounded-2xl border border-[var(--border)]',
-        'bg-[var(--surface-raised)] p-6 cursor-pointer select-none',
-        'flex flex-col',
-        'transition-all duration-200 hover:-translate-y-1 hover:shadow-lg',
-        'focus-visible:ring-2 focus-visible:ring-offset-2 outline-none'
+        'glass-card glass-card-interactive relative w-full h-[272px] shrink-0 rounded-2xl p-6',
+        'cursor-pointer select-none flex flex-col items-center text-center',
+        'focus-visible:ring-2 focus-visible:ring-offset-2 outline-none',
+        selected && 'ring-2 ring-[var(--accent-color)] ring-offset-2 ring-offset-[var(--surface)]'
       )}
-      style={{ '--member-color': member.favorite_color } as React.CSSProperties}
+      style={{ '--accent-color': member.favorite_color } as React.CSSProperties}
     >
-      {/* Color accent bar */}
+      {/* Avatar with color ring */}
       <div
-        className="absolute top-0 left-6 right-6 h-0.5 rounded-b-full opacity-60"
-        style={{ backgroundColor: member.favorite_color }}
-        aria-hidden="true"
-      />
-
-      <div className="flex items-start gap-4">
+        className="relative mb-4 rounded-full p-0.5"
+        style={{
+          background: `linear-gradient(135deg, ${member.favorite_color}88, ${member.favorite_color}22)`,
+        }}
+      >
         <Avatar
           src={member.profile_picture}
           name={member.full_name}
           color={member.favorite_color}
           bgColor={member.avatar_background_color}
           size="lg"
+          className="ring-2 ring-[var(--surface)]"
         />
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-[var(--text-primary)] truncate">{member.full_name}</h3>
-          <p className="text-sm text-[var(--text-secondary)] truncate mt-0.5">{primaryRole}</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1">
-            {member.years_of_experience} yr{member.years_of_experience !== 1 ? 's' : ''} experience
-          </p>
-        </div>
       </div>
 
-      {/* Skills — fixed height row, no stretching */}
-      <div className="mt-4 flex flex-wrap gap-1.5 content-start flex-1">
-        {topSkills.map((skill) => (
-          <Badge key={skill} label={skill} color={member.favorite_color} className="self-start" />
+      <h3 className="font-semibold text-[var(--text-primary)] truncate max-w-full px-1">
+        {member.full_name}
+      </h3>
+      <p className="text-sm text-[var(--text-secondary)] truncate max-w-full px-1 mt-0.5">
+        {primaryRole}
+      </p>
+      <p className="text-xs text-[var(--text-muted)] mt-1">
+        {member.years_of_experience} yr{member.years_of_experience !== 1 ? 's' : ''} experience
+      </p>
+
+      {/* Skills — fit within card, never clip */}
+      <div className="chip-row mt-auto pt-4">
+        {visibleSkills.map((skill) => (
+          <Badge key={skill} label={skill} color={member.favorite_color} />
         ))}
-        {member.skills.length > 3 && (
-          <span className="text-xs text-[var(--text-muted)] self-start">
-            +{member.skills.length - 3} more
-          </span>
+        {hiddenCount > 0 && (
+          <span className="chip-more">+{hiddenCount} more</span>
         )}
-      </div>
-
-      <div
-        className="mt-4 pt-3 border-t border-[var(--border)] flex items-center gap-1 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        style={{ color: member.favorite_color }}
-      >
-        View profile
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-          <path d="M2.5 6h7M6 2.5L9.5 6 6 9.5" />
-        </svg>
       </div>
     </article>
   );

@@ -1,58 +1,164 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@dev-team-cv/shared-utils';
 import { useScrollSpy } from '@dev-team-cv/shared-hooks';
 import { ThemeToggle } from '@dev-team-cv/ui';
 
-const SECTIONS = ['hero', 'about', 'team', 'projects', 'skills', 'constellation', 'contact'];
+const HOME_SECTIONS = ['hero', 'about', 'team', 'projects', 'skills', 'constellation', 'contact'];
+const NAV_ITEMS = HOME_SECTIONS.filter((s) => s !== 'hero');
 const LABELS: Record<string, string> = {
-  hero: 'Home', about: 'About', team: 'Team', projects: 'Projects',
-  skills: 'Skills', constellation: 'Network', contact: 'Contact',
+  hero: 'Home',
+  about: 'About',
+  team: 'Team',
+  projects: 'Projects',
+  skills: 'Skills',
+  constellation: 'Network',
+  contact: 'Contact',
 };
 
 export function Nav() {
-  const active = useScrollSpy(SECTIONS);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const onHome = location.pathname === '/';
+  const scrollActive = useScrollSpy(HOME_SECTIONS);
+  const [pending, setPending] = useState<string | null>(null);
+  const active = onHome
+    ? pending ?? scrollActive
+    : location.pathname === '/projects'
+    ? 'projects'
+    : '';
+
+  useEffect(() => {
+    if (pending && scrollActive === pending) setPending(null);
+  }, [scrollActive, pending]);
+
+  useEffect(() => {
+    if (!pending) return;
+    const cancel = () => setPending(null);
+    window.addEventListener('wheel', cancel, { passive: true });
+    window.addEventListener('touchmove', cancel, { passive: true });
+    return () => {
+      window.removeEventListener('wheel', cancel);
+      window.removeEventListener('touchmove', cancel);
+    };
+  }, [pending]);
+
   const [menuOpen, setMenuOpen] = useState(false);
+  const listRef = useRef<HTMLUListElement>(null);
+  const btnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, opacity: 0 });
+
+  const updateIndicator = useCallback(() => {
+    if (!onHome && location.pathname !== '/') {
+      const btn = btnRefs.current.get('projects');
+      const list = listRef.current;
+      if (!btn || !list) return;
+      const listRect = list.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      setIndicator({
+        left: btnRect.left - listRect.left,
+        width: btnRect.width,
+        opacity: 1,
+      });
+      return;
+    }
+
+    const btn = btnRefs.current.get(active);
+    const list = listRef.current;
+    if (!btn || !list || !active) {
+      setIndicator((prev) => ({ ...prev, opacity: 0 }));
+      return;
+    }
+    const listRect = list.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    setIndicator({
+      left: btnRect.left - listRect.left,
+      width: btnRect.width,
+      opacity: 1,
+    });
+  }, [active, onHome, location.pathname]);
+
+  useLayoutEffect(() => {
+    updateIndicator();
+  }, [updateIndicator, menuOpen]);
+
+  useEffect(() => {
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [updateIndicator]);
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     setMenuOpen(false);
+    if (id === 'projects' && !onHome) return;
+    if (!onHome) {
+      navigate({ pathname: '/', hash: `#${id}` });
+      return;
+    }
+    setPending(id);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const goHome = () => {
+    setMenuOpen(false);
+    if (onHome) {
+      document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/');
+    }
+  };
+
+  const linkClass = (id: string, isActive: boolean, fullWidth = false) =>
+    cn(
+      'relative z-10 rounded-full text-sm font-medium transition-colors duration-200',
+      fullWidth ? 'w-full text-left px-3 py-2.5' : 'px-3.5 py-2',
+      isActive
+        ? 'font-semibold text-[var(--text-primary)]'
+        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+    );
 
   return (
     <header className="fixed top-0 inset-x-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]/90 backdrop-blur-md">
       <nav className="mx-auto max-w-7xl flex h-14 items-center justify-between px-6" aria-label="Main navigation">
-        {/* Logo */}
         <button
-          onClick={() => scrollTo('hero')}
+          onClick={goHome}
           className="font-semibold text-[var(--text-primary)] text-sm tracking-tight"
           aria-label="Go to top"
         >
           dev<span className="text-[var(--text-muted)]">team</span>
         </button>
 
-        {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-1" role="list">
-          {SECTIONS.filter((s) => s !== 'hero').map((id) => (
-            <li key={id}>
-              <button
-                onClick={() => scrollTo(id)}
-                className={cn(
-                  'px-3 py-1.5 rounded-md text-sm transition-colors duration-150',
-                  active === id
-                    ? 'text-[var(--text-primary)] bg-[var(--surface-raised)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)]'
-                )}
-                aria-current={active === id ? 'page' : undefined}
-              >
-                {LABELS[id]}
-              </button>
-            </li>
-          ))}
+        <ul ref={listRef} className="relative hidden md:flex items-center gap-0.5" role="list">
+          <div
+            aria-hidden="true"
+            className="nav-glass-indicator pointer-events-none absolute top-1/2 -translate-y-1/2"
+            style={{
+              left: indicator.left,
+              width: indicator.width,
+              opacity: indicator.opacity,
+            }}
+          />
+          {NAV_ITEMS.map((id) => {
+            const isActive = active === id;
+            return (
+              <li key={id}>
+                <button
+                  ref={(el) => {
+                    if (el) btnRefs.current.set(id, el);
+                    else btnRefs.current.delete(id);
+                  }}
+                  onClick={() => scrollTo(id)}
+                  className={linkClass(id, isActive)}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {LABELS[id]}
+                </button>
+              </li>
+            );
+          })}
         </ul>
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          {/* Mobile menu toggle */}
           <button
             className="md:hidden p-2 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)] transition-colors"
             onClick={() => setMenuOpen((v) => !v)}
@@ -68,20 +174,37 @@ export function Nav() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-[var(--border)] bg-[var(--surface)] px-6 pb-4">
           <ul className="flex flex-col gap-1 pt-3">
-            {SECTIONS.filter((s) => s !== 'hero').map((id) => (
-              <li key={id}>
-                <button
-                  onClick={() => scrollTo(id)}
-                  className="w-full text-left px-3 py-2 rounded-md text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)] transition-colors"
+            {NAV_ITEMS.map((id) => {
+              const isActive = active === id;
+              return (
+                <li key={id}>
+                  <button
+                    onClick={() => scrollTo(id)}
+                    className={cn(
+                      linkClass(id, isActive, true),
+                      isActive && 'bg-[var(--surface-overlay)] ring-1 ring-[var(--border)]'
+                    )}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {LABELS[id]}
+                  </button>
+                </li>
+              );
+            })}
+            {!onHome && (
+              <li>
+                <Link
+                  to="/"
+                  onClick={() => setMenuOpen(false)}
+                  className="block w-full text-left px-3 py-2.5 rounded-full text-sm font-medium text-[var(--text-secondary)]"
                 >
-                  {LABELS[id]}
-                </button>
+                  Back to home
+                </Link>
               </li>
-            ))}
+            )}
           </ul>
         </div>
       )}

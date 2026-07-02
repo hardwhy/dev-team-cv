@@ -9,6 +9,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
   loading?: boolean;
   icon?: React.ReactNode;
+  as?: React.ElementType;
+  href?: string;
 }
 
 const variantClasses: Record<Variant, string> = {
@@ -29,10 +31,10 @@ const sizeClasses: Record<Size, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', loading, icon, className, children, disabled, ...props }, ref) => (
-    <button
+  ({ variant = 'primary', size = 'md', loading, icon, className, children, disabled, as: Comp = 'button', ...props }, ref) => (
+    <Comp
       ref={ref}
-      disabled={disabled || loading}
+      disabled={Comp === 'button' ? disabled || loading : undefined}
       className={cn(
         'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200',
         'disabled:opacity-50 disabled:cursor-not-allowed select-none',
@@ -48,7 +50,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         icon
       )}
       {children}
-    </button>
+    </Comp>
   )
 );
 Button.displayName = 'Button';
