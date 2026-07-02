@@ -29,7 +29,7 @@ export function AllProjectsPage() {
 
         <div className="pb-16 text-center">
           <Link
-            to="/#projects"
+            to="/?section=projects"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

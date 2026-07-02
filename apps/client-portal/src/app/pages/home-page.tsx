@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useEngineerMode } from '@dev-team-cv/shared-hooks';
 import { teamMembersApi, projectsApi } from '@dev-team-cv/supabase';
 import type { TeamMember, Project } from '@dev-team-cv/shared-types';
@@ -14,7 +13,6 @@ import { ConstellationSection } from '../sections/constellation-section';
 
 export function HomePage() {
   const engineerMode = useEngineerMode();
-  const location = useLocation();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,16 +26,6 @@ export function HomePage() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
-
-  // Scroll to hash after navigating from /projects
-  useEffect(() => {
-    if (!location.hash) return;
-    const id = location.hash.slice(1);
-    const t = setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-    return () => clearTimeout(t);
-  }, [location.hash]);
 
   return (
     <>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDragScroll } from '@dev-team-cv/shared-hooks';
 import { cn } from '@dev-team-cv/shared-utils';
 import { SectionWrapper, Skeleton, SectionHeader } from '@dev-team-cv/ui';
@@ -101,15 +102,15 @@ export function ProjectsSection({
 
         {showAllLink && displayed.length > 0 && (
           <div className="mt-10 text-center">
-            <a
-              href={allProjectsHref}
+            <Link
+              to={allProjectsHref}
               className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-raised)] px-5 py-2.5 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-overlay)] transition-colors"
             >
               View all projects
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M2 7h10M7 2l5 5-5 5" />
               </svg>
-            </a>
+            </Link>
           </div>
         )}
       </div>

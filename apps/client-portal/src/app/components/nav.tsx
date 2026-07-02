@@ -3,30 +3,48 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@dev-team-cv/shared-utils';
 import { useScrollSpy } from '@dev-team-cv/shared-hooks';
 import { ThemeToggle } from '@dev-team-cv/ui';
+import { useSectionQuery } from '../hooks/use-section-query';
 
-const HOME_SECTIONS = ['hero', 'about', 'team', 'projects', 'skills', 'constellation', 'contact'];
-const NAV_ITEMS = HOME_SECTIONS.filter((s) => s !== 'hero');
-const LABELS: Record<string, string> = {
-  hero: 'Home',
+const HOME_SECTIONS = ['hero', 'about', 'team', 'projects', 'skills', 'constellation', 'contact'] as const;
+const NAV_SECTIONS = HOME_SECTIONS.filter((s) => s !== 'hero');
+const SECTION_LABELS: Record<(typeof NAV_SECTIONS)[number], string> = {
   about: 'About',
   team: 'Team',
-  projects: 'Projects',
+  projects: 'Featured',
   skills: 'Skills',
   constellation: 'Network',
   contact: 'Contact',
 };
 
+type NavKey = (typeof NAV_SECTIONS)[number] | 'all-projects';
+
+const NAV_ITEMS: { key: NavKey; label: string; type: 'section' | 'route'; to?: string }[] = [
+  ...NAV_SECTIONS.map((id) => ({
+    key: id as NavKey,
+    label: SECTION_LABELS[id],
+    type: 'section' as const,
+  })),
+  { key: 'all-projects', label: 'All Projects', type: 'route', to: '/projects' },
+];
+
 export function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
-  const onHome = location.pathname === '/';
-  const scrollActive = useScrollSpy(HOME_SECTIONS);
+  const { onHome, section, goToSection, syncSectionFromScroll } = useSectionQuery(HOME_SECTIONS);
+  const scrollActive = useScrollSpy([...HOME_SECTIONS]);
   const [pending, setPending] = useState<string | null>(null);
-  const active = onHome
-    ? pending ?? scrollActive
-    : location.pathname === '/projects'
-    ? 'projects'
+
+  const onAllProjects = location.pathname === '/projects';
+  const active: NavKey | '' = onAllProjects
+    ? 'all-projects'
+    : onHome
+    ? ((pending ?? section ?? scrollActive) as NavKey)
     : '';
+
+  useEffect(() => {
+    if (!onHome || pending) return;
+    syncSectionFromScroll(scrollActive);
+  }, [onHome, pending, scrollActive, syncSectionFromScroll]);
 
   useEffect(() => {
     if (pending && scrollActive === pending) setPending(null);
@@ -45,24 +63,10 @@ export function Nav() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const listRef = useRef<HTMLUListElement>(null);
-  const btnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const btnRefs = useRef<Map<string, HTMLButtonElement | HTMLAnchorElement>>(new Map());
   const [indicator, setIndicator] = useState({ left: 0, width: 0, opacity: 0 });
 
   const updateIndicator = useCallback(() => {
-    if (!onHome && location.pathname !== '/') {
-      const btn = btnRefs.current.get('projects');
-      const list = listRef.current;
-      if (!btn || !list) return;
-      const listRect = list.getBoundingClientRect();
-      const btnRect = btn.getBoundingClientRect();
-      setIndicator({
-        left: btnRect.left - listRect.left,
-        width: btnRect.width,
-        opacity: 1,
-      });
-      return;
-    }
-
     const btn = btnRefs.current.get(active);
     const list = listRef.current;
     if (!btn || !list || !active) {
@@ -76,7 +80,7 @@ export function Nav() {
       width: btnRect.width,
       opacity: 1,
     });
-  }, [active, onHome, location.pathname]);
+  }, [active]);
 
   useLayoutEffect(() => {
     updateIndicator();
@@ -87,27 +91,23 @@ export function Nav() {
     return () => window.removeEventListener('resize', updateIndicator);
   }, [updateIndicator]);
 
-  const scrollTo = (id: string) => {
-    setMenuOpen(false);
-    if (id === 'projects' && !onHome) return;
-    if (!onHome) {
-      navigate({ pathname: '/', hash: `#${id}` });
-      return;
-    }
-    setPending(id);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const goHome = () => {
     setMenuOpen(false);
     if (onHome) {
-      document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
+      setPending('hero');
+      goToSection('hero', { replace: true });
     } else {
       navigate('/');
     }
   };
 
-  const linkClass = (id: string, isActive: boolean, fullWidth = false) =>
+  const handleSectionClick = (id: (typeof NAV_SECTIONS)[number]) => {
+    setMenuOpen(false);
+    setPending(id);
+    goToSection(id);
+  };
+
+  const linkClass = (key: NavKey, isActive: boolean, fullWidth = false) =>
     cn(
       'relative z-10 rounded-full text-sm font-medium transition-colors duration-200',
       fullWidth ? 'w-full text-left px-3 py-2.5' : 'px-3.5 py-2',
@@ -137,20 +137,38 @@ export function Nav() {
               opacity: indicator.opacity,
             }}
           />
-          {NAV_ITEMS.map((id) => {
-            const isActive = active === id;
+          {NAV_ITEMS.map(({ key, label, type, to }) => {
+            const isActive = active === key;
+            if (type === 'route' && to) {
+              return (
+                <li key={key}>
+                  <Link
+                    ref={(el) => {
+                      if (el) btnRefs.current.set(key, el);
+                      else btnRefs.current.delete(key);
+                    }}
+                    to={to}
+                    className={linkClass(key, isActive)}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            }
+
             return (
-              <li key={id}>
+              <li key={key}>
                 <button
                   ref={(el) => {
-                    if (el) btnRefs.current.set(id, el);
-                    else btnRefs.current.delete(id);
+                    if (el) btnRefs.current.set(key, el);
+                    else btnRefs.current.delete(key);
                   }}
-                  onClick={() => scrollTo(id)}
-                  className={linkClass(id, isActive)}
+                  onClick={() => handleSectionClick(key as (typeof NAV_SECTIONS)[number])}
+                  className={linkClass(key, isActive)}
                   aria-current={isActive ? 'page' : undefined}
                 >
-                  {LABELS[id]}
+                  {label}
                 </button>
               </li>
             );
@@ -177,34 +195,41 @@ export function Nav() {
       {menuOpen && (
         <div className="md:hidden border-t border-[var(--border)] bg-[var(--surface)] px-6 pb-4">
           <ul className="flex flex-col gap-1 pt-3">
-            {NAV_ITEMS.map((id) => {
-              const isActive = active === id;
+            {NAV_ITEMS.map(({ key, label, type, to }) => {
+              const isActive = active === key;
+              if (type === 'route' && to) {
+                return (
+                  <li key={key}>
+                    <Link
+                      to={to}
+                      onClick={() => setMenuOpen(false)}
+                      className={cn(
+                        linkClass(key, isActive, true),
+                        isActive && 'bg-[var(--surface-overlay)] ring-1 ring-[var(--border)]'
+                      )}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                );
+              }
+
               return (
-                <li key={id}>
+                <li key={key}>
                   <button
-                    onClick={() => scrollTo(id)}
+                    onClick={() => handleSectionClick(key as (typeof NAV_SECTIONS)[number])}
                     className={cn(
-                      linkClass(id, isActive, true),
+                      linkClass(key, isActive, true),
                       isActive && 'bg-[var(--surface-overlay)] ring-1 ring-[var(--border)]'
                     )}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    {LABELS[id]}
+                    {label}
                   </button>
                 </li>
               );
             })}
-            {!onHome && (
-              <li>
-                <Link
-                  to="/"
-                  onClick={() => setMenuOpen(false)}
-                  className="block w-full text-left px-3 py-2.5 rounded-full text-sm font-medium text-[var(--text-secondary)]"
-                >
-                  Back to home
-                </Link>
-              </li>
-            )}
           </ul>
         </div>
       )}
