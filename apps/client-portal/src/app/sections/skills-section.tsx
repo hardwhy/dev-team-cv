@@ -1,34 +1,46 @@
-import { SectionWrapper, Badge } from '@dev-team-cv/ui';
-import type { TeamMember } from '@dev-team-cv/shared-types';
+import { SectionWrapper, Badge, SectionHeader } from '@dev-team-cv/ui';
+import type { TeamMember, Project } from '@dev-team-cv/shared-types';
 
 interface SkillsSectionProps {
   members: TeamMember[];
+  projects?: Project[];
 }
 
-export function SkillsSection({ members }: SkillsSectionProps) {
-  // Aggregate all skills with member color info
+export function SkillsSection({ members, projects = [] }: SkillsSectionProps) {
   const skillMap = new Map<string, { skill: string; color: string; count: number }>();
+
   members.forEach((m) => {
     m.skills.forEach((s) => {
-      if (!skillMap.has(s)) {
+      const existing = skillMap.get(s);
+      if (!existing) {
         skillMap.set(s, { skill: s, color: m.favorite_color, count: 1 });
       } else {
-        skillMap.get(s)!.count++;
+        existing.count++;
       }
     });
   });
+
+  projects.forEach((p) => {
+    p.technologies.forEach((t) => {
+      const existing = skillMap.get(t);
+      if (!existing) {
+        skillMap.set(t, { skill: t, color: 'var(--text-muted)', count: 1 });
+      } else {
+        existing.count++;
+      }
+    });
+  });
+
   const skills = [...skillMap.values()].sort((a, b) => b.count - a.count);
 
   return (
     <SectionWrapper id="skills" className="py-24 border-t border-[var(--border)]">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-12 text-center">
-          <p className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-widest mb-3">Capabilities</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)]">Skills &amp; Technologies</h2>
-          <p className="mt-3 text-lg text-[var(--text-secondary)] max-w-xl mx-auto">
-            The tools we reach for to get things done well.
-          </p>
-        </div>
+        <SectionHeader
+          label="Capabilities"
+          title="Skills & Technologies"
+          subtitle="The tools we reach for to get things done well."
+        />
 
         <div className="flex flex-wrap justify-center gap-3">
           {skills.map((s) => (

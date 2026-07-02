@@ -11,7 +11,8 @@ export function FeaturedProjectsSection({ projects, loading, featured }: Props) 
       featuredOnly={featured}
       title="Featured Projects"
       subtitle="Our most impactful work."
-      sectionId="featured-projects"
+      sectionId="projects"
+      showAllLink
     />
   );
 }

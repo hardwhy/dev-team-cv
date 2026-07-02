@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { SectionWrapper, Button, Input, Textarea } from '@dev-team-cv/ui';
+import { SectionWrapper, Button, Input, Textarea, SectionHeader } from '@dev-team-cv/ui';
 import { contactApi, settingsApi } from '@dev-team-cv/supabase';
 
 const schema = z.object({
@@ -94,10 +94,11 @@ export function ContactSection() {
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* Left */}
           <div>
-            <p className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-widest mb-3">Contact</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-6">
-              Let&rsquo;s build something together.
-            </h2>
+            <SectionHeader
+              label="Contact"
+              title="Let's build something together."
+              className="mb-6"
+            />
             <p className="text-[var(--text-secondary)] leading-relaxed mb-8">
               Have a project in mind? We would love to hear about it. Send us a message and we will get back to you within 24 hours.
             </p>
