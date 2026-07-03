@@ -6,7 +6,9 @@ import { ThemeToggle, BrandLogo } from '@dev-team-cv/ui';
 import { useBranding } from '@dev-team-cv/supabase';
 import { useSectionQuery } from '../hooks/use-section-query';
 
-const HOME_SECTIONS = ['hero', 'about', 'team', 'projects', 'skills', 'constellation', 'contact'] as const;
+// 'constellation' is intentionally omitted here to hide it from the nav/scroll-spy
+// while keeping the section code and label mapping in place for future use.
+const HOME_SECTIONS = ['hero', 'about', 'team', 'projects', 'skills', 'contact'] as const;
 const NAV_ITEMS = HOME_SECTIONS.filter((s) => s !== 'hero');
 const LABELS: Record<string, string> = {
   hero: 'Home',
