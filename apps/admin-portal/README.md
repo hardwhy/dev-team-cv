@@ -95,7 +95,7 @@ via `.github/workflows/deploy-admin.yml`.
 
 | Type | Name | Value |
 |------|------|-------|
-| Secret | `ADMIN_DEPLOY_TOKEN` | PAT with `repo` scope that can push to `hardwhy/dev-team-cv-admin` |
+| Secret | `ADMIN_DEPLOY_TOKEN` | Fine-grained PAT on `hardwhy/dev-team-cv-admin` with **Contents: Read and write** (push `gh-pages`) and **Pages: Read and write** (trigger site build). Classic PAT: `repo` scope also works. |
 | Secret | `VITE_SUPABASE_URL` | your Supabase URL |
 | Secret | `VITE_SUPABASE_ANON_KEY` | your Supabase anon key |
 | Variable | `VITE_CLIENT_PORTAL_URL` | (optional) e.g. `https://hardwhy.github.io/dev-team-cv/` |

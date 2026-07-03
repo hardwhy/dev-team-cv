@@ -12,7 +12,8 @@ name: Deploy Admin Portal
 #     ADMIN_PAGES_REPO       (optional) defaults to hardwhy/dev-team-cv-admin
 #     VITE_CLIENT_PORTAL_URL (optional) public client portal URL for the Preview button
 #   Secrets:
-#     ADMIN_DEPLOY_TOKEN     a Personal Access Token with `repo` scope that can push to the placeholder repo
+#     ADMIN_DEPLOY_TOKEN     PAT with Contents write on the placeholder repo (push gh-pages)
+#                            AND Pages write (POST /pages/builds to trigger the site build)
 #     VITE_SUPABASE_URL
 #     VITE_SUPABASE_ANON_KEY
 
@@ -47,7 +48,7 @@ jobs:
           ADMIN_DEPLOY_TOKEN: ${{ secrets.ADMIN_DEPLOY_TOKEN }}
         run: |
           if [ -z "$ADMIN_DEPLOY_TOKEN" ]; then
-            echo "::error::ADMIN_DEPLOY_TOKEN secret is not set. Create a PAT with 'repo' scope that can push to the placeholder repo, then add it under Settings -> Secrets and variables -> Actions -> Secrets."
+            echo "::error::ADMIN_DEPLOY_TOKEN secret is not set. Create a fine-grained PAT (or classic PAT with repo scope) that can push to the placeholder repo and request Pages builds, then add it under Settings -> Secrets and variables -> Actions -> Secrets."
             exit 1
           fi
           if [ -z "$ADMIN_PAGES_REPO" ]; then
@@ -78,11 +79,6 @@ jobs:
       - name: Add SPA fallback (404 -> index)
         run: cp apps/admin-portal/dist/index.html apps/admin-portal/dist/404.html
 
-      # force_orphan makes peaceiris push a fresh single commit on every run,
-      # even when the built output is unchanged. That push is what triggers the
-      # placeholder repo's Pages build, so re-running always refreshes the site.
-      # (Requesting a build via the Pages API instead would need Pages:write on
-      # the token; a Contents-write token is enough for this push.)
       - name: Deploy to placeholder repo
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -90,4 +86,11 @@ jobs:
           external_repository: ${{ env.ADMIN_PAGES_REPO }}
           publish_branch: gh-pages
           publish_dir: apps/admin-portal/dist
-          force_orphan: true
+
+      # peaceiris only pushes when the built output changed. Explicitly request a
+      # Pages build so every workflow run refreshes the placeholder site even
+      # when gh-pages content is unchanged. Requires Pages: write on the token.
+      - name: Trigger GitHub Pages build on placeholder repo
+        env:
+          GH_TOKEN: ${{ secrets.ADMIN_DEPLOY_TOKEN }}
+        run: gh api --method POST "repos/${ADMIN_PAGES_REPO}/pages/builds"
