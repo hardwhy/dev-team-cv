@@ -42,8 +42,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Guard against missing target repo
+      - name: Guard against missing config
+        env:
+          ADMIN_DEPLOY_TOKEN: ${{ secrets.ADMIN_DEPLOY_TOKEN }}
         run: |
+          if [ -z "$ADMIN_DEPLOY_TOKEN" ]; then
+            echo "::error::ADMIN_DEPLOY_TOKEN secret is not set. Create a PAT with 'repo' scope that can push to the placeholder repo, then add it under Settings -> Secrets and variables -> Actions -> Secrets."
+            exit 1
+          fi
           if [ -z "$ADMIN_PAGES_REPO" ]; then
             ADMIN_PAGES_REPO="hardwhy/dev-team-cv-admin"
             echo "ADMIN_PAGES_REPO=$ADMIN_PAGES_REPO" >> "$GITHUB_ENV"
