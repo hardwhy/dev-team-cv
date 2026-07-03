@@ -12,6 +12,9 @@ const libAlias = (name: string) =>
 
 export default defineConfig({
   root: appDir,
+  // Base public path. Defaults to '/' for local dev; set VITE_BASE_PATH
+  // (e.g. '/dev-team-admin/') when deploying to a GitHub Pages project site.
+  base: process.env['VITE_BASE_PATH'] || '/',
   cacheDir: '../../node_modules/.vite/apps/admin-portal',
   plugins: [react()],
   css: {

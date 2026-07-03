@@ -11,6 +11,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode;
   as?: React.ElementType;
   href?: string;
+  to?: string;
 }
 
 const variantClasses: Record<Variant, string> = {

@@ -1,4 +1,5 @@
 export * from './lib/badge';
+export * from './lib/brand-logo';
 export * from './lib/button';
 export * from './lib/card';
 export * from './lib/modal';

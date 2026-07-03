@@ -21,6 +21,16 @@ export const projectsApi = {
     return (data ?? []).map(normalizeProject);
   },
 
+  async getById(id: string): Promise<Project | null> {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*, team_members:project_members(team_members(*))')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return data ? normalizeProject(data) : null;
+  },
+
   async getBySlug(slug: string): Promise<Project | null> {
     const { data, error } = await supabase
       .from('projects')

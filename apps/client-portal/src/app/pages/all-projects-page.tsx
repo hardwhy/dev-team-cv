@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { projectsApi } from '@dev-team-cv/supabase';
 import type { Project } from '@dev-team-cv/shared-types';
 import { ProjectsSection } from '@dev-team-cv/features-projects';
+import { SiteFooter } from '../components/site-footer';
 
 export function AllProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -40,9 +41,7 @@ export function AllProjectsPage() {
         </div>
       </main>
 
-      <footer className="border-t border-[var(--border)] py-8 text-center text-sm text-[var(--text-muted)]">
-        <p>&copy; {new Date().getFullYear()} devteam. Built with React, Vite &amp; Supabase.</p>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

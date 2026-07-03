@@ -1,10 +1,12 @@
 import { Button } from '@dev-team-cv/ui';
+import { useBranding } from '@dev-team-cv/supabase';
 
 interface HeroSectionProps {
   engineerMode: boolean;
 }
 
 export function HeroSection({ engineerMode }: HeroSectionProps) {
+  const branding = useBranding();
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -26,14 +28,14 @@ export function HeroSection({ engineerMode }: HeroSectionProps) {
 
         {/* Headline */}
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-[var(--text-primary)] mb-6 animate-fade-in">
-          We build software
+          {branding.heroHeadline}
           <br />
-          <span className="text-[var(--text-secondary)]">that people love.</span>
+          <span className="text-[var(--text-secondary)]">{branding.heroHeadlineAccent}</span>
         </h1>
 
         {/* Tagline */}
         <p className="text-xl md:text-2xl text-[var(--text-secondary)] max-w-2xl mx-auto mb-4 animate-fade-in" style={{ animationDelay: '100ms' }}>
-          A focused team of engineers crafting elegant, performant cross-platform experiences.
+          {branding.tagline}
         </p>
 
         <p className="text-base text-[var(--text-muted)] max-w-xl mx-auto mb-10 animate-fade-in" style={{ animationDelay: '150ms' }}>

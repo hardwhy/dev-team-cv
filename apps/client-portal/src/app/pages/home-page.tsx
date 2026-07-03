@@ -10,6 +10,7 @@ import { FeaturedProjectsSection } from '../sections/featured-projects-section';
 import { SkillsSection } from '../sections/skills-section';
 import { ContactSection } from '../sections/contact-section';
 import { ConstellationSection } from '../sections/constellation-section';
+import { SiteFooter } from '../components/site-footer';
 
 export function HomePage() {
   const engineerMode = useEngineerMode();
@@ -31,7 +32,7 @@ export function HomePage() {
     <>
       <main id="main-content" tabIndex={-1}>
         <HeroSection engineerMode={engineerMode} />
-        <AboutSection />
+        <AboutSection members={members} projects={projects} />
         <TeamSection members={members} projects={projects} loading={loading} />
         <FeaturedProjectsSection projects={projects} loading={loading} featured />
         <SkillsSection members={members} projects={projects} />
@@ -39,9 +40,7 @@ export function HomePage() {
         <ContactSection />
       </main>
 
-      <footer className="border-t border-[var(--border)] py-8 text-center text-sm text-[var(--text-muted)]">
-        <p>&copy; {new Date().getFullYear()} devteam. Built with React, Vite &amp; Supabase.</p>
-      </footer>
+      <SiteFooter />
 
       {engineerMode && <EngineerModeBadge />}
     </>
