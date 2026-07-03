@@ -78,6 +78,11 @@ jobs:
       - name: Add SPA fallback (404 -> index)
         run: cp apps/admin-portal/dist/index.html apps/admin-portal/dist/404.html
 
+      # force_orphan makes peaceiris push a fresh single commit on every run,
+      # even when the built output is unchanged. That push is what triggers the
+      # placeholder repo's Pages build, so re-running always refreshes the site.
+      # (Requesting a build via the Pages API instead would need Pages:write on
+      # the token; a Contents-write token is enough for this push.)
       - name: Deploy to placeholder repo
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -85,11 +90,4 @@ jobs:
           external_repository: ${{ env.ADMIN_PAGES_REPO }}
           publish_branch: gh-pages
           publish_dir: apps/admin-portal/dist
-
-      # peaceiris only pushes when the built output changed, and the legacy
-      # branch-based Pages build isn't always auto-triggered reliably. Kick a
-      # Pages build explicitly so every run refreshes the placeholder site.
-      - name: Trigger GitHub Pages build on placeholder repo
-        env:
-          GH_TOKEN: ${{ secrets.ADMIN_DEPLOY_TOKEN }}
-        run: gh api --method POST "repos/${ADMIN_PAGES_REPO}/pages/builds"
+          force_orphan: true
