@@ -85,3 +85,11 @@ jobs:
           external_repository: ${{ env.ADMIN_PAGES_REPO }}
           publish_branch: gh-pages
           publish_dir: apps/admin-portal/dist
+
+      # peaceiris only pushes when the built output changed, and the legacy
+      # branch-based Pages build isn't always auto-triggered reliably. Kick a
+      # Pages build explicitly so every run refreshes the placeholder site.
+      - name: Trigger GitHub Pages build on placeholder repo
+        env:
+          GH_TOKEN: ${{ secrets.ADMIN_DEPLOY_TOKEN }}
+        run: gh api --method POST "repos/${ADMIN_PAGES_REPO}/pages/builds"
