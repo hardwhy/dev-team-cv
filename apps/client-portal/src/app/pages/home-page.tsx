@@ -9,7 +9,8 @@ import { TeamSection } from '../sections/team-section-wrapper';
 import { FeaturedProjectsSection } from '../sections/featured-projects-section';
 import { SkillsSection } from '../sections/skills-section';
 import { ContactSection } from '../sections/contact-section';
-import { ConstellationSection } from '../sections/constellation-section';
+// Kept for future use — constellation section is currently hidden.
+// import { ConstellationSection } from '../sections/constellation-section';
 import { SiteFooter } from '../components/site-footer';
 
 export function HomePage() {
@@ -36,7 +37,8 @@ export function HomePage() {
         <TeamSection members={members} projects={projects} loading={loading} />
         <FeaturedProjectsSection projects={projects} loading={loading} featured />
         <SkillsSection members={members} projects={projects} />
-        <ConstellationSection members={members} projects={projects} />
+        {/* Constellation section temporarily hidden — kept for future use. */}
+        {/* <ConstellationSection members={members} projects={projects} /> */}
         <ContactSection />
       </main>
 

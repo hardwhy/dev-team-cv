@@ -4,6 +4,7 @@ const { join } = require('path');
 module.exports = {
   darkMode: 'class',
   content: [
+    join(__dirname, 'index.html'),
     join(__dirname, 'src/**/*.{ts,tsx,html}'),
     join(__dirname, '../../libs/**/*.{ts,tsx}'),
   ],

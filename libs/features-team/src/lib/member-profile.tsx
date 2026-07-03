@@ -140,7 +140,7 @@ export function MemberProfile({ member, projects, open, onClose, onProjectClick 
                 {memberData.long_bio || memberData.short_bio}
               </p>
 
-              {(memberData.linkedin_url || memberData.github_url || memberData.email) && (
+              {(memberData.linkedin_url || memberData.github_url || memberData.portfolio_url || memberData.email) && (
                 <div className="flex flex-wrap gap-2 mt-4">
                   {memberData.linkedin_url && (
                     <a
@@ -160,6 +160,16 @@ export function MemberProfile({ member, projects, open, onClose, onProjectClick 
                       className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)] transition-colors"
                     >
                       GitHub
+                    </a>
+                  )}
+                  {memberData.portfolio_url && (
+                    <a
+                      href={memberData.portfolio_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)] transition-colors"
+                    >
+                      Portfolio
                     </a>
                   )}
                   {memberData.email && (
