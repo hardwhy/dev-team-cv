@@ -4,3 +4,6 @@ export * from './lib/projects.api';
 export * from './lib/contact.api';
 export * from './lib/storage.api';
 export * from './lib/settings.api';
+export * from './lib/about-content';
+export * from './lib/branding';
+export * from './lib/contact-links';

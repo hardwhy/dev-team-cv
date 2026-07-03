@@ -23,7 +23,9 @@ export function ContactsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-[var(--text-primary)]">Contact Submissions</h1>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">{contacts.length} total submissions.</p>
+        <p className="text-sm text-[var(--text-secondary)] mt-1">
+          Messages sent from the public contact form. {contacts.length} total.
+        </p>
       </div>
 
       {loading ? (
@@ -51,7 +53,7 @@ export function ContactsPage() {
         </div>
       ) : (
         <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-[var(--border)] text-sm text-[var(--text-muted)]">
-          No submissions yet
+          No messages yet — submissions from the contact form will appear here.
         </div>
       )}
     </div>

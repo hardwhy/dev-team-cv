@@ -2,7 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@dev-team-cv/shared-utils';
 import { useScrollSpy } from '@dev-team-cv/shared-hooks';
-import { ThemeToggle } from '@dev-team-cv/ui';
+import { ThemeToggle, BrandLogo } from '@dev-team-cv/ui';
+import { useBranding } from '@dev-team-cv/supabase';
 import { useSectionQuery } from '../hooks/use-section-query';
 
 const HOME_SECTIONS = ['hero', 'about', 'team', 'projects', 'skills', 'constellation', 'contact'] as const;
@@ -19,6 +20,7 @@ const LABELS: Record<string, string> = {
 
 export function Nav() {
   const navigate = useNavigate();
+  const branding = useBranding();
   const { onHome, goToSection, setActiveSection } = useSectionQuery(HOME_SECTIONS);
   const scrollActive = useScrollSpy([...HOME_SECTIONS]);
   const [pending, setPending] = useState<string | null>(null);
@@ -106,10 +108,10 @@ export function Nav() {
       <nav className="mx-auto max-w-7xl flex h-14 items-center justify-between px-6" aria-label="Main navigation">
         <button
           onClick={goHome}
-          className="font-semibold text-[var(--text-primary)] text-sm tracking-tight"
+          className="font-semibold text-[var(--text-primary)] text-sm"
           aria-label="Go to top"
         >
-          dev<span className="text-[var(--text-muted)]">team</span>
+          <BrandLogo primary={branding.primary} secondary={branding.secondary} />
         </button>
 
         <ul ref={listRef} className="relative hidden md:flex items-center gap-0.5" role="list">

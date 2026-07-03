@@ -1,0 +1,81 @@
+name: Deploy Admin Portal
+
+# Builds the admin portal and publishes it to a SEPARATE ("placeholder") repo
+# that hosts its own GitHub Pages site. This keeps the admin build off the main
+# repo's Pages site (which is used by the client portal).
+#
+# Default target: hardwhy/dev-team-cv-admin
+# Override with the ADMIN_PAGES_REPO repository variable if needed.
+#
+# Required repository configuration (Settings -> Secrets and variables -> Actions):
+#   Variables:
+#     ADMIN_PAGES_REPO       (optional) defaults to hardwhy/dev-team-cv-admin
+#     VITE_CLIENT_PORTAL_URL (optional) public client portal URL for the Preview button
+#   Secrets:
+#     ADMIN_DEPLOY_TOKEN     a Personal Access Token with `repo` scope that can push to the placeholder repo
+#     VITE_SUPABASE_URL
+#     VITE_SUPABASE_ANON_KEY
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Only one admin deployment at a time; don't cancel an in-progress deploy
+concurrency:
+  group: admin-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    env:
+      ADMIN_PAGES_REPO: ${{ vars.ADMIN_PAGES_REPO }}
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      VITE_CLIENT_PORTAL_URL: ${{ vars.VITE_CLIENT_PORTAL_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Guard against missing target repo
+        run: |
+          if [ -z "$ADMIN_PAGES_REPO" ]; then
+            ADMIN_PAGES_REPO="hardwhy/dev-team-cv-admin"
+            echo "ADMIN_PAGES_REPO=$ADMIN_PAGES_REPO" >> "$GITHUB_ENV"
+          fi
+          echo "Deploying to $ADMIN_PAGES_REPO"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve base path
+        id: base
+        # Project site is served from https://<owner>.github.io/<repo>/
+        run: echo "path=/${ADMIN_PAGES_REPO#*/}/" >> "$GITHUB_OUTPUT"
+
+      - name: Build admin portal
+        run: npm run build:admin
+        env:
+          VITE_BASE_PATH: ${{ steps.base.outputs.path }}
+
+      - name: Add SPA fallback (404 -> index)
+        run: cp apps/admin-portal/dist/index.html apps/admin-portal/dist/404.html
+
+      - name: Deploy to placeholder repo
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.ADMIN_DEPLOY_TOKEN }}
+          external_repository: ${{ env.ADMIN_PAGES_REPO }}
+          publish_branch: gh-pages
+          publish_dir: apps/admin-portal/dist

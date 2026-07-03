@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@dev-team-cv/auth';
-import { Button, Input } from '@dev-team-cv/ui';
+import { Button, Input, BrandLogo } from '@dev-team-cv/ui';
 import { ThemeToggle } from '@dev-team-cv/ui';
+import { useBranding } from '@dev-team-cv/supabase';
 
 export function LoginPage() {
   const { signIn } = useAuth();
+  const branding = useBranding();
+  const year = new Date().getFullYear();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +30,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--surface)] p-6">
+    <div className="relative min-h-screen flex flex-col items-center justify-center bg-[var(--surface)] p-6">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
@@ -35,7 +38,7 @@ export function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-            dev<span className="text-[var(--text-muted)]">team</span>
+            <BrandLogo primary={branding.primary} secondary={branding.secondary} />
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">Sign in to the admin dashboard</p>
         </div>
@@ -63,6 +66,10 @@ export function LoginPage() {
           </form>
         </div>
       </div>
+
+      <p className="absolute bottom-6 left-0 right-0 text-center text-xs text-[var(--text-muted)]">
+        &copy; {year} {branding.copyrightName}. All rights reserved.
+      </p>
     </div>
   );
 }

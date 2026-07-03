@@ -1,6 +1,6 @@
 import { supabase } from './supabase-client';
 
-export type StorageBucket = 'team-members' | 'projects';
+export type StorageBucket = 'team-members' | 'projects' | 'contact-icons';
 
 export const storageApi = {
   async upload(bucket: StorageBucket, path: string, file: File): Promise<string> {

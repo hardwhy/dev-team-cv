@@ -21,11 +21,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'h-10 w-full rounded-md border bg-[var(--surface)] px-3 text-sm text-[var(--text-primary)]',
-            'placeholder:text-[var(--text-muted)] transition-colors duration-150',
+            'h-10 w-full rounded-lg border bg-[var(--surface)] px-3.5 text-sm text-[var(--text-primary)]',
+            'placeholder:text-[var(--text-muted)] transition-all duration-150',
+            'focus:outline-none focus:ring-4',
             error
-              ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30'
-              : 'border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500',
+              ? 'border-red-500 focus:ring-red-500/20'
+              : 'border-[var(--border)] hover:border-[var(--text-muted)] focus:border-blue-500 focus:ring-blue-500/15',
             className
           )}
           aria-invalid={!!error}
