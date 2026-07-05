@@ -5,6 +5,7 @@ import { Button, Input, Textarea, Skeleton } from '@dev-team-cv/ui';
 import { slugify } from '@dev-team-cv/shared-utils';
 import type { ProjectInsert, TeamMember } from '@dev-team-cv/shared-types';
 import { DirtyDot, TechChipInput, ThumbnailPicker } from '../components/project-form-fields';
+import { ConfirmDialog } from '../components/confirm-dialog';
 
 const EMPTY: ProjectInsert = {
   title: '', slug: '', description: '', technologies: [], gallery_images: [],
@@ -28,6 +29,7 @@ export function ProjectFormPage() {
   const [thumbFile, setThumbFile] = useState<File | null>(null);
   const thumbFileRef = useRef<File | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [discardOpen, setDiscardOpen] = useState(false);
 
   const isDirty =
     thumbFileRef.current !== null ||
@@ -80,10 +82,10 @@ export function ProjectFormPage() {
       .finally(() => setLoading(false));
   }, [isEditing, projectId]);
 
-  const handleClose = () => {
+  const requestLeave = () => {
     if (saving) return;
-    if (isDirty && !window.confirm('Discard unsaved changes?')) return;
-    navigate('/projects');
+    if (isDirty) setDiscardOpen(true);
+    else navigate('/projects');
   };
 
   const f = (field: keyof ProjectInsert, value: unknown) =>
@@ -156,8 +158,9 @@ export function ProjectFormPage() {
               e.preventDefault();
               return;
             }
-            if (isDirty && !window.confirm('Discard unsaved changes?')) {
+            if (isDirty) {
               e.preventDefault();
+              setDiscardOpen(true);
             }
           }}
           aria-label="Back to projects"
@@ -285,13 +288,26 @@ export function ProjectFormPage() {
           <DirtyDot isDirty={isDirty} />
           <span className="text-xs text-[var(--text-muted)]">{isDirty ? 'Unsaved changes' : 'Up to date'}</span>
           <div className="ml-auto flex gap-3">
-            <Button variant="secondary" disabled={saving} onClick={handleClose}>Cancel</Button>
+            <Button variant="secondary" disabled={saving} onClick={requestLeave}>Cancel</Button>
             <Button loading={saving} disabled={!isDirty} onClick={handleSave}>
               {isEditing ? 'Save Changes' : 'Create Project'}
             </Button>
           </div>
         </div>
       </section>
+
+      <ConfirmDialog
+        open={discardOpen}
+        title="Discard unsaved changes?"
+        description="Your changes will be lost if you leave without saving."
+        confirmLabel="Discard"
+        variant="danger"
+        onConfirm={() => {
+          setDiscardOpen(false);
+          navigate('/projects');
+        }}
+        onCancel={() => setDiscardOpen(false)}
+      />
     </div>
   );
 }

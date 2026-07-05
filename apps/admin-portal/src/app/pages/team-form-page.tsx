@@ -5,10 +5,13 @@ import { Button, Input, Textarea, Skeleton, Avatar } from '@dev-team-cv/ui';
 import { generateStoragePath } from '@dev-team-cv/shared-utils';
 import type { TeamMember, TeamMemberInsert } from '@dev-team-cv/shared-types';
 import { DirtyDot } from '../components/project-form-fields';
+import { ContactLinksEditor } from '../components/contact-links-editor';
+import { ConfirmDialog } from '../components/confirm-dialog';
+import { resolveContactLinkIcons } from '../utils/resolve-contact-link-icons';
 
 const EMPTY_FORM: TeamMemberInsert = {
   full_name: '', role: [], short_bio: '', long_bio: '', years_of_experience: 0,
-  skills: [], linkedin_url: '', github_url: '', portfolio_url: '', email: '',
+  skills: [], social_links: [],
   favorite_color: '#2563EB', accent_color: '#1D4ED8', secondary_color: '#BFDBFE',
   avatar_background_color: '#EFF6FF', profile_picture: null,
 };
@@ -112,13 +115,17 @@ export function TeamFormPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const photoFileRef = useRef<File | null>(null);
+  const [iconFiles, setIconFiles] = useState<(File | null)[]>([]);
+  const [discardOpen, setDiscardOpen] = useState(false);
 
-  const isDirty = photoFileRef.current !== null || JSON.stringify(form) !== JSON.stringify(savedForm);
+  const hasPendingIcons = iconFiles.some(Boolean);
+  const isDirty = photoFileRef.current !== null || hasPendingIcons || JSON.stringify(form) !== JSON.stringify(savedForm);
 
   useEffect(() => {
     if (!isEditing) {
       setForm(EMPTY_FORM); setSavedForm(EMPTY_FORM);
       setPhotoFile(null); photoFileRef.current = null;
+      setIconFiles([]);
       setSaveError(null); setNotFound(false); setLoading(false);
       return;
     }
@@ -130,14 +137,15 @@ export function TeamFormPage() {
         const initial: TeamMemberInsert = {
           full_name: m.full_name, role: m.role, short_bio: m.short_bio, long_bio: m.long_bio,
           years_of_experience: m.years_of_experience, skills: m.skills,
-          linkedin_url: m.linkedin_url ?? '', github_url: m.github_url ?? '',
-          portfolio_url: m.portfolio_url ?? '', email: m.email ?? '',
+          social_links: m.social_links ?? [],
           favorite_color: m.favorite_color, accent_color: m.accent_color,
           secondary_color: m.secondary_color, avatar_background_color: m.avatar_background_color,
           profile_picture: m.profile_picture,
         };
         setForm(initial); setSavedForm(initial);
-        setPhotoFile(null); photoFileRef.current = null; setSaveError(null);
+        setPhotoFile(null); photoFileRef.current = null;
+        setIconFiles(m.social_links?.map(() => null) ?? []);
+        setSaveError(null);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -146,7 +154,11 @@ export function TeamFormPage() {
   const f = (field: keyof TeamMemberInsert, value: unknown) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
-  const guardLeave = () => !isDirty || window.confirm('Discard unsaved changes?');
+  const requestLeave = () => {
+    if (saving) return;
+    if (isDirty) setDiscardOpen(true);
+    else navigate('/team');
+  };
 
   const handleSave = async () => {
     setSaving(true); setSaveError(null);
@@ -156,7 +168,15 @@ export function TeamFormPage() {
         const path = generateStoragePath('profiles', photoFile.name);
         photoUrl = await storageApi.upload('team-members', path, photoFile);
       }
-      const payload = { ...form, profile_picture: photoUrl };
+
+      const socialLinks = await resolveContactLinkIcons(
+        form.social_links,
+        iconFiles,
+        (path, file) => storageApi.upload('contact-icons', path, file),
+        'member-icons'
+      );
+
+      const payload = { ...form, profile_picture: photoUrl, social_links: socialLinks };
       if (isEditing) await teamMembersApi.update(memberId!, payload);
       else await teamMembersApi.create(payload);
       navigate('/team');
@@ -184,7 +204,7 @@ export function TeamFormPage() {
           to="/team"
           onClick={(e) => {
             if (saving) { e.preventDefault(); return; }
-            if (!guardLeave()) e.preventDefault();
+            if (isDirty) { e.preventDefault(); setDiscardOpen(true); }
           }}
           aria-label="Back to team"
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)] transition-colors"
@@ -247,10 +267,16 @@ export function TeamFormPage() {
                 value={form.skills} onChange={(v) => f('skills', v)} />
             </div>
 
-            <Input label="Email" type="email" value={form.email ?? ''} onChange={(e) => f('email', e.target.value)} />
-            <Input label="LinkedIn URL" value={form.linkedin_url ?? ''} onChange={(e) => f('linkedin_url', e.target.value)} />
-            <Input label="GitHub URL" value={form.github_url ?? ''} onChange={(e) => f('github_url', e.target.value)} />
-            <Input label="Portfolio URL" value={form.portfolio_url ?? ''} onChange={(e) => f('portfolio_url', e.target.value)} />
+            <div className="md:col-span-2">
+              <ContactLinksEditor
+                key={isEditing ? memberId : 'new'}
+                links={form.social_links}
+                savedLinks={savedForm.social_links}
+                onLinksChange={(social_links) => f('social_links', social_links)}
+                iconFiles={iconFiles}
+                onIconFilesChange={setIconFiles}
+              />
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
@@ -295,7 +321,7 @@ export function TeamFormPage() {
           <DirtyDot isDirty={isDirty} />
           <span className="text-xs text-[var(--text-muted)]">{isDirty ? 'Unsaved changes' : 'Up to date'}</span>
           <div className="ml-auto flex gap-3">
-            <Button variant="secondary" disabled={saving} onClick={() => { if (guardLeave()) navigate('/team'); }}>
+            <Button variant="secondary" disabled={saving} onClick={requestLeave}>
               Cancel
             </Button>
             <Button loading={saving} disabled={!isDirty} onClick={handleSave}>
@@ -304,6 +330,19 @@ export function TeamFormPage() {
           </div>
         </div>
       </section>
+
+      <ConfirmDialog
+        open={discardOpen}
+        title="Discard unsaved changes?"
+        description="Your changes will be lost if you leave without saving."
+        confirmLabel="Discard"
+        variant="danger"
+        onConfirm={() => {
+          setDiscardOpen(false);
+          navigate('/team');
+        }}
+        onCancel={() => setDiscardOpen(false)}
+      />
     </div>
   );
 }

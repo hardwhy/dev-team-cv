@@ -80,3 +80,30 @@ export function normalizeContactUrl(url: string): string {
 export function isExternalContactUrl(url: string): boolean {
   return /^https?:\/\//i.test(url.trim());
 }
+
+function normalizeContactLink(item: unknown): ContactLink | null {
+  if (typeof item !== 'object' || item === null) return null;
+  return normalizeLegacyLink(item as Record<string, unknown>);
+}
+
+/** Parses a social_links jsonb array (or legacy JSON string). Returns [] when empty. */
+export function parseSocialLinks(raw: unknown): ContactLink[] {
+  if (!raw) return [];
+
+  const parsed: unknown =
+    typeof raw === 'string'
+      ? (() => {
+          try {
+            return JSON.parse(raw);
+          } catch {
+            return null;
+          }
+        })()
+      : raw;
+
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed
+    .map(normalizeContactLink)
+    .filter((item): item is ContactLink => item !== null);
+}

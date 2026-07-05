@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Avatar, Badge, SubsectionLabel } from '@dev-team-cv/ui';
+import { Avatar, Badge, SubsectionLabel, SocialIcon } from '@dev-team-cv/ui';
 import { cn, formatDate } from '@dev-team-cv/shared-utils';
+import { isExternalContactUrl, normalizeContactUrl } from '@dev-team-cv/supabase';
 import type { TeamMember, Project } from '@dev-team-cv/shared-types';
 
 interface MemberProfileProps {
@@ -140,46 +141,27 @@ export function MemberProfile({ member, projects, open, onClose, onProjectClick 
                 {memberData.long_bio || memberData.short_bio}
               </p>
 
-              {(memberData.linkedin_url || memberData.github_url || memberData.portfolio_url || memberData.email) && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {memberData.linkedin_url && (
-                    <a
-                      href={memberData.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)] transition-colors"
-                    >
-                      LinkedIn
-                    </a>
-                  )}
-                  {memberData.github_url && (
-                    <a
-                      href={memberData.github_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)] transition-colors"
-                    >
-                      GitHub
-                    </a>
-                  )}
-                  {memberData.portfolio_url && (
-                    <a
-                      href={memberData.portfolio_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)] transition-colors"
-                    >
-                      Portfolio
-                    </a>
-                  )}
-                  {memberData.email && (
-                    <a
-                      href={`mailto:${memberData.email}`}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)] transition-colors"
-                    >
-                      Email
-                    </a>
-                  )}
+              {memberData.social_links?.some((link) => link.iconUrl.trim()) && (
+                <div className="flex flex-wrap items-center gap-4 mt-4">
+                  {memberData.social_links.map((link, index) => {
+                    const href = normalizeContactUrl(link.url);
+                    if (!href || !link.iconUrl.trim()) return null;
+                    const external = isExternalContactUrl(href);
+
+                    return (
+                      <a
+                        key={`${link.slug}-${index}`}
+                        href={href}
+                        target={external ? '_blank' : undefined}
+                        rel={external ? 'noopener noreferrer' : undefined}
+                        aria-label={link.label || link.slug}
+                        title={link.label || link.slug}
+                        className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                      >
+                        <SocialIcon iconUrl={link.iconUrl} label={link.label || link.slug} />
+                      </a>
+                    );
+                  })}
                 </div>
               )}
             </div>

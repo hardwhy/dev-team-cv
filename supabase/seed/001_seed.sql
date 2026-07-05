@@ -1,6 +1,6 @@
 insert into team_members (
   full_name, role, short_bio, long_bio, years_of_experience, skills,
-  linkedin_url, github_url, email,
+  social_links,
   favorite_color, accent_color, secondary_color, avatar_background_color
 )
 values
@@ -11,9 +11,11 @@ values
     'Ayi is a senior engineer with deep expertise in building beautiful, performant apps for both mobile and web. He leads frontend architecture decisions and champions clean code practices across the team.',
     6,
     ARRAY['Flutter','Dart','React','TypeScript','Tailwind CSS','Firebase','Supabase','REST APIs','GraphQL','CI/CD'],
-    'https://linkedin.com/in/ayi-hardiyanto',
-    'https://github.com/ayi-hardiyanto',
-    'ayi@devteam.dev',
+    '[
+      {"slug":"email","label":"Email","url":"mailto:ayi@devteam.dev","iconUrl":""},
+      {"slug":"linkedin","label":"LinkedIn","url":"https://linkedin.com/in/ayi-hardiyanto","iconUrl":""},
+      {"slug":"github","label":"GitHub","url":"https://github.com/ayi-hardiyanto","iconUrl":""}
+    ]'::jsonb,
     '#2563EB', '#1D4ED8', '#BFDBFE', '#EFF6FF'
   ),
   (
@@ -23,9 +25,11 @@ values
     'Dedy specialises in backend architecture, API design, and cloud infrastructure. He ensures the team''s systems are reliable, secure, and performant at scale.',
     5,
     ARRAY['Node.js','Express','PostgreSQL','Docker','AWS','TypeScript','REST APIs','Microservices','Redis','GitHub Actions'],
-    'https://linkedin.com/in/dedy-indra',
-    'https://github.com/dedy-indra',
-    'dedy@devteam.dev',
+    '[
+      {"slug":"email","label":"Email","url":"mailto:dedy@devteam.dev","iconUrl":""},
+      {"slug":"linkedin","label":"LinkedIn","url":"https://linkedin.com/in/dedy-indra","iconUrl":""},
+      {"slug":"github","label":"GitHub","url":"https://github.com/dedy-indra","iconUrl":""}
+    ]'::jsonb,
     '#059669', '#047857', '#A7F3D0', '#ECFDF5'
   ),
   (
@@ -35,8 +39,10 @@ values
     'Syehan bridges design and engineering, creating cohesive design systems and implementing them with precision. He cares deeply about accessibility, performance, and delightful user experiences.',
     4,
     ARRAY['React','TypeScript','Tailwind CSS','Figma','Next.js','Framer Motion','WCAG','Storybook','CSS','Animation'],
-    'https://linkedin.com/in/muhammad-syehan',
-    'https://github.com/muhammad-syehan',
-    'syehan@devteam.dev',
+    '[
+      {"slug":"email","label":"Email","url":"mailto:syehan@devteam.dev","iconUrl":""},
+      {"slug":"linkedin","label":"LinkedIn","url":"https://linkedin.com/in/muhammad-syehan","iconUrl":""},
+      {"slug":"github","label":"GitHub","url":"https://github.com/muhammad-syehan","iconUrl":""}
+    ]'::jsonb,
     '#EA580C', '#C2410C', '#FED7AA', '#FFF7ED'
   );
