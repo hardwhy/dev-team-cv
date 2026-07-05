@@ -2,10 +2,15 @@ import { supabase } from './supabase-client';
 import { parseSocialLinks } from './contact-links';
 import type { TeamMember, TeamMemberInsert, TeamMemberUpdate } from '@dev-team-cv/shared-types';
 
-function normalizeMember(raw: Record<string, unknown>): TeamMember {
+function normalizeMember(raw: unknown): TeamMember {
+  const member = raw as TeamMember;
   return {
-    ...(raw as TeamMember),
-    social_links: parseSocialLinks(raw.social_links),
+    ...member,
+    social_links: parseSocialLinks(
+      typeof raw === 'object' && raw !== null && 'social_links' in raw
+        ? (raw as { social_links: unknown }).social_links
+        : undefined
+    ),
   };
 }
 

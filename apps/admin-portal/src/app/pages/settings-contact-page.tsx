@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { CONTACT_LINKS_KEY, parseContactLinks, settingsApi, storageApi, resolveContactLinkIcons } from '@dev-team-cv/supabase';
+import { CONTACT_LINKS_KEY, parseContactLinks, settingsApi, storageApi } from '@dev-team-cv/supabase';
 import { DEFAULT_CONTACT_LINKS, type ContactLink } from '@dev-team-cv/shared-types';
 import { FormCard } from '../components/form-card';
 import { ContactLinksEditor } from '../components/contact-links-editor';
+import { resolveContactLinkIcons } from '../utils/resolve-contact-link-icons';
 
 export function ContactInfoPage() {
   const [links, setLinks] = useState<ContactLink[]>(DEFAULT_CONTACT_LINKS);

@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import { teamMembersApi, storageApi, resolveContactLinkIcons } from '@dev-team-cv/supabase';
+import { teamMembersApi, storageApi } from '@dev-team-cv/supabase';
 import { Button, Input, Textarea, Skeleton, Avatar } from '@dev-team-cv/ui';
 import { generateStoragePath } from '@dev-team-cv/shared-utils';
 import type { TeamMember, TeamMemberInsert } from '@dev-team-cv/shared-types';
 import { DirtyDot } from '../components/project-form-fields';
 import { ContactLinksEditor } from '../components/contact-links-editor';
 import { ConfirmDialog } from '../components/confirm-dialog';
+import { resolveContactLinkIcons } from '../utils/resolve-contact-link-icons';
 
 const EMPTY_FORM: TeamMemberInsert = {
   full_name: '', role: [], short_bio: '', long_bio: '', years_of_experience: 0,
