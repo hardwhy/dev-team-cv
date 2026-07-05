@@ -1,3 +1,21 @@
+// ─── Contact Links ───────────────────────────────────────────────────────────
+
+export interface ContactLink {
+  /** URL-safe identifier, e.g. "github". */
+  slug: string;
+  /** Display text shown on the public site. */
+  label: string;
+  /** Destination URL or mailto: link. */
+  url: string;
+  /** Public URL of the uploaded icon image. */
+  iconUrl: string;
+}
+
+export const DEFAULT_CONTACT_LINKS: ContactLink[] = [
+  { slug: 'email', label: 'Email', url: 'mailto:hello@devteam.dev', iconUrl: '' },
+  { slug: 'github', label: 'GitHub', url: 'https://github.com/dev-team', iconUrl: '' },
+];
+
 // ─── Team Member ────────────────────────────────────────────────────────────
 
 export interface TeamMember {
@@ -9,10 +27,7 @@ export interface TeamMember {
   long_bio: string;
   years_of_experience: number;
   skills: string[];
-  linkedin_url: string | null;
-  github_url: string | null;
-  portfolio_url: string | null;
-  email: string | null;
+  social_links: ContactLink[];
   favorite_color: string;
   accent_color: string;
   secondary_color: string;
@@ -120,22 +135,4 @@ export const DEFAULT_ABOUT_VALUES: AboutValue[] = [
   { title: 'Clarity', desc: 'We communicate openly, write clear code, and build systems that are easy to understand and extend.' },
   { title: 'Ownership', desc: 'We take full responsibility from design to deployment, treating every project as our own.' },
   { title: 'Collaboration', desc: 'Small team, big thinking. We work closely with clients and each other to deliver the best outcome.' },
-];
-
-// ─── Contact Links ───────────────────────────────────────────────────────────
-
-export interface ContactLink {
-  /** URL-safe identifier, e.g. "github". */
-  slug: string;
-  /** Display text shown on the public site. */
-  label: string;
-  /** Destination URL or mailto: link. */
-  url: string;
-  /** Public URL of the uploaded icon image. */
-  iconUrl: string;
-}
-
-export const DEFAULT_CONTACT_LINKS: ContactLink[] = [
-  { slug: 'email', label: 'Email', url: 'mailto:hello@devteam.dev', iconUrl: '' },
-  { slug: 'github', label: 'GitHub', url: 'https://github.com/dev-team', iconUrl: '' },
 ];

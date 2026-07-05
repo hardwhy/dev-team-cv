@@ -1,4 +1,5 @@
 import { DEFAULT_CONTACT_LINKS, type ContactLink } from '@dev-team-cv/shared-types';
+import { generateStoragePath } from '@dev-team-cv/shared-utils';
 
 export const CONTACT_LINKS_KEY = 'contact_links';
 
@@ -79,4 +80,51 @@ export function normalizeContactUrl(url: string): string {
 
 export function isExternalContactUrl(url: string): boolean {
   return /^https?:\/\//i.test(url.trim());
+}
+
+function normalizeContactLink(item: unknown): ContactLink | null {
+  if (typeof item !== 'object' || item === null) return null;
+  return normalizeLegacyLink(item as Record<string, unknown>);
+}
+
+/** Parses a social_links jsonb array (or legacy JSON string). Returns [] when empty. */
+export function parseSocialLinks(raw: unknown): ContactLink[] {
+  if (!raw) return [];
+
+  const parsed: unknown =
+    typeof raw === 'string'
+      ? (() => {
+          try {
+            return JSON.parse(raw);
+          } catch {
+            return null;
+          }
+        })()
+      : raw;
+
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed
+    .map(normalizeContactLink)
+    .filter((item): item is ContactLink => item !== null);
+}
+
+/** Uploads pending icon files and returns links with resolved iconUrl values. */
+export async function resolveContactLinkIcons(
+  links: ContactLink[],
+  iconFiles: (File | null)[],
+  upload: (path: string, file: File) => Promise<string>,
+  pathPrefix = 'icons'
+): Promise<ContactLink[]> {
+  return Promise.all(
+    links.map(async (link, index) => {
+      const file = iconFiles[index];
+      if (!file) return link;
+
+      const slug = link.slug.trim() || `link-${index}`;
+      const path = generateStoragePath(`${pathPrefix}/${slug}`, file.name);
+      const iconUrl = await upload(path, file);
+      return { ...link, iconUrl };
+    })
+  );
 }

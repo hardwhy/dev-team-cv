@@ -12,3 +12,4 @@ export * from './lib/scroll-progress';
 export * from './lib/theme-toggle';
 export * from './lib/section-wrapper';
 export * from './lib/section-header';
+export * from './lib/social-icon';
